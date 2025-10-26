@@ -26,7 +26,7 @@ export const createUserController = async (req, res) => {
         }
 
     } catch (error) {
-        console.log('Error during creting a user.');
+        console.log('Error during creting a user.', error);
         res.status(500).json({ message: 'Server Error.' })
     }
 }
