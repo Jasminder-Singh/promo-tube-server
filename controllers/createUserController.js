@@ -4,12 +4,13 @@ import { userModel } from "../lib/database/userSchema.js";
 export const createUserController = async (req, res) => {
     try {
         await connectDB();
-        const { fullName, email: { emailAddress }, userId } = req.body;
-        console.log(userId)
+        const { fullName, email, userId } = req.body;
         // First check if user already crated.
-        const isAlreadyCreated = await userModel.findOne({ userId });
+        console.log(email)
+        const isAlreadyCreated = await userModel.findOne({ email : email.emailAddress });
+        console.log("isAlreadyCreated = ", isAlreadyCreated)
         if (isAlreadyCreated) {
-            res.status(409).json({ message: "Account is already created.", user : isAlreadyCreated });
+            res.status(409).json({ message: "Account is already created.", user: isAlreadyCreated });
         } else {
             const user = await userModel.create({
                 userId,
@@ -19,7 +20,7 @@ export const createUserController = async (req, res) => {
                 campaigns: [],
                 dailyTasks: [],
                 notifications: [],
-                currentPoints : 3000
+                currentPoints: 3000
             });
 
             res.status(201).json({ message: 'User Created Successfully.', user: user });
