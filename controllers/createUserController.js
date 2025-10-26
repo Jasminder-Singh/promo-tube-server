@@ -5,6 +5,7 @@ export const createUserController = async (req, res) => {
     try {
         await connectDB();
         const { fullName, email: { emailAddress }, userId } = req.body;
+        console.log(userId)
         // First check if user already crated.
         const isAlreadyCreated = await userModel.findOne({ userId });
         if (isAlreadyCreated) {
