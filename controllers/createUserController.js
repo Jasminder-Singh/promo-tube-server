@@ -7,7 +7,8 @@ export const createUserController = async (req, res) => {
         const { fullName, email, userId } = req.body;
         // First check if user already crated.
         
-        const isAlreadyCreated = await userModel.findOne({ email : email.emailAddress });
+        const isAlreadyCreated = await userModel.findOne({ email : email.emailAddress }).populate('campaigns');
+        console.log(isAlreadyCreated)
         
         if (isAlreadyCreated) {
             res.status(409).json({ message: "Account is already created.", user: isAlreadyCreated });
