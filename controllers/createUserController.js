@@ -6,8 +6,6 @@ export const createUserController = async (req, res) => {
         await connectDB();
         const { fullName, email, userId, referral } = req.body;
         // First check if user already crated.
-        console.log(referral)
-
         const isAlreadyCreated = await userModel.findOne({ email: email.emailAddress }).populate('campaigns');
 
         if (isAlreadyCreated) {
