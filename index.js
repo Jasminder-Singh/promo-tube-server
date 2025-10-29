@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import creatUserRoute from './routes/createUserRoute.js';
 import creatCampaignRoute from './routes/createCampaignRoute.js';
+import verifyPayment from './routes/verifyPayment.js';
 import { userModel } from "./lib/database/userSchema.js";
 import { campaignModel } from "./lib/database/campaignSchema.js";
 import { connectDB } from "./lib/database/connectDB.js";
@@ -19,6 +20,7 @@ const server = http.createServer(app);
 
 app.use('/api/user', creatUserRoute);
 app.use('/api/campaign', creatCampaignRoute);
+app.use('/api/payment', verifyPayment);
 
 
 app.get('/api', (req, res) => {
