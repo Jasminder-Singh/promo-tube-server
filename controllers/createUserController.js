@@ -11,20 +11,20 @@ export const createUserController = async (req, res) => {
         if (isAlreadyCreated) {
             res.status(409).json({ message: "Account is already created.", user: isAlreadyCreated });
         } else {
-            // if thi user is referred by someone then that user should get 5000 points.
+            // if thi user is referred by someone then that user should get 500 points.
             if (referral) {
                 await userModel.findOneAndUpdate(
                     { referralCode: referral },
                     {
                         $inc: {
-                            referralPointsEarned: 5000,
+                            referralPointsEarned: 500,
                             referralCount: 1,
-                            currentPoints: 5000,
-                            todayEarned: 5000
+                            currentPoints: 500,
+                            todayEarned: 500
                         },
                         $push: {
                             notifications: {
-                                message: "Congrats! You’ve earned 5000 points through a referral!",
+                                message: "Congrats! You’ve earned 500 points through a referral!",
                                 notificationDate: new Date(),
                                 isRead: false,
                             }
@@ -39,14 +39,14 @@ export const createUserController = async (req, res) => {
                 campaigns: [],
                 dailyTasks: [],
                 notifications: referral ? [{
-                    message: "Congrats! You’ve earned 5000 points for joining through a referral!",
+                    message: "Congrats! You’ve earned 500 points for joining through a referral!",
                     notificationDate: new Date(),
                     isRead: false,
                 },] : [],
-                currentPoints: referral ? 3000 + 5000 : 3000,
-                referralPointsEarned: referral ? 5000 : 0,
+                currentPoints: referral ? 3000 + 500 : 3000,
+                referralPointsEarned: referral ? 500 : 0,
                 referralCount: 0,
-                todayEarned: referral ? 5000 : 0,
+                todayEarned: referral ? 500 : 0,
                 referralCode: email.emailAddress.split('@')[0]
 
             });
