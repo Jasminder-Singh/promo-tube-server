@@ -7,6 +7,7 @@ dotenv.config();
 import creatUserRoute from './routes/createUserRoute.js';
 import creatCampaignRoute from './routes/createCampaignRoute.js';
 import verifyPayment from './routes/verifyPayment.js';
+import dailyTasks from './routes/dailyTasks.js';
 import { userModel } from "./lib/database/userSchema.js";
 import { campaignModel } from "./lib/database/campaignSchema.js";
 import { connectDB } from "./lib/database/connectDB.js";
@@ -21,6 +22,7 @@ const server = http.createServer(app);
 app.use('/api/user', creatUserRoute);
 app.use('/api/campaign', creatCampaignRoute);
 app.use('/api/payment', verifyPayment);
+app.use('/api/create', dailyTasks)
 
 
 app.get('/api', (req, res) => {
@@ -84,7 +86,7 @@ io.on('connection', (socket) => {
                 { new: true }
             );
             const { completed, target, platform } = campaignVisited;
-            
+
             let message = setMessage(completed, target, platform);
 
             const campaignCreator = await userModel.findByIdAndUpdate({ _id: campaignCreatedUserId }, {
@@ -106,6 +108,42 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('campaignDailyTask', async (email, campaigns) => { // campaigns = [{},{},{},{}]
+        await connectDB();
+        const user = await userModel.findOne({ email }).populate('campaigns');
+
+        const todayCreatedCampaigns = user.campaigns.reduce((acc, camp) => {
+            return (new Date(camp.date).getDate() === new Date().getDate()) ? acc + 1 : acc
+
+        }, 0)
+
+        let taskPoints = 0;
+        if (todayCreatedCampaigns) {
+
+            const dailyTasks = user.dailyTasks.map((dt) => {
+                if (dt.task === 'campaign' && todayCreatedCampaigns >= dt.target && !dt.completed) {
+                    taskPoints += dt.points;
+                    return {
+                        ...dt,
+                        completed: true,
+
+
+                    }
+                }
+                return dt;
+            });
+
+            user.dailyTasks = dailyTasks;
+            user.currentPoints += taskPoints;
+            user.todayEarned += taskPoints
+            user.save();
+
+        }
+
+
+
+        socket.emit('confirmCampaignTask', user);
+    })
     socket.on('read_notification', async ({ id }) => {
         await connectDB()
         await userModel.updateMany(
