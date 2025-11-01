@@ -12,8 +12,7 @@ export const updateDailyTasks = async (req, res) => {
                     dailyTasks: tasks
                 }
             }, { new: true })
-            console.log(user);
-
+            
         res.status(201).json({ message: 'Updated successfully.', user })
     } catch (error) {
         console.log(error)

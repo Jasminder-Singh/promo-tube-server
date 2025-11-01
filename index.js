@@ -153,6 +153,38 @@ io.on('connection', (socket) => {
         );
 
     })
+    socket.on('visitDailyTask', async (email, visitedData) => {
+        try {
+            await connectDB();
+            const date = new Date(visitedData.date).getDate();
+            const visit = parseInt(visitedData.visit);
+            let points = 0;
+            const user = await userModel.findOne({ email });
+            if (user) {
+                const dailyTask = user.dailyTasks.map((dt) => {
+
+                    if (!dt.completed && new Date(dt.updatedAt).getDate() === date && visit >= dt.target && dt.task === 'visit') {
+                        points += dt.points;
+                        return {
+                            ...dt,
+                            completed: true
+                        }
+                    }
+
+                    return dt;
+                });
+
+                user.dailyTasks = dailyTask;
+                user.currentPoints += points;
+                user.todayEarned += points;
+                user.save();
+                socket.emit('updatedVisitTask',user);
+            }
+
+        } catch (error) {
+            console.log("Error in visit daily task", error)
+        }
+    })
 });
 
 server.listen(3001, () => {
