@@ -11,6 +11,8 @@ import dailyTasks from './routes/dailyTasks.js';
 import { userModel } from "./lib/database/userSchema.js";
 import { campaignModel } from "./lib/database/campaignSchema.js";
 import { connectDB } from "./lib/database/connectDB.js";
+import cron from "node-cron";
+import { cronJobController } from "./controllers/cronJobController.js";
 
 const app = express();
 app.use(express.json());
@@ -55,6 +57,7 @@ io.on('connection', (socket) => {
     socket.on('earned_points', async ({ points, campaignCreatedUserId, visitorId, campaignId }) => {
 
         try {
+            console.log(points)
             await connectDB()
             const visitor = await userModel.findByIdAndUpdate({ _id: visitorId },
                 {
@@ -178,7 +181,7 @@ io.on('connection', (socket) => {
                 user.currentPoints += points;
                 user.todayEarned += points;
                 user.save();
-                socket.emit('updatedVisitTask',user);
+                socket.emit('updatedVisitTask', user);
             }
 
         } catch (error) {
@@ -188,5 +191,11 @@ io.on('connection', (socket) => {
 });
 
 server.listen(3001, () => {
-    console.log('Server is listening.')
-})
+    console.log("✅ Server is listening on port 78965");
+
+    // Run every 2 seconds
+    cron.schedule("0 0 * * *", async () => {
+        console.log("⏰ Running cron job every 2 seconds...");
+        await cronJobController();
+    });
+});
