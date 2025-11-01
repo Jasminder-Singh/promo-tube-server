@@ -57,7 +57,6 @@ io.on('connection', (socket) => {
     socket.on('earned_points', async ({ points, campaignCreatedUserId, visitorId, campaignId }) => {
 
         try {
-            console.log(points)
             await connectDB()
             const visitor = await userModel.findByIdAndUpdate({ _id: visitorId },
                 {
@@ -139,7 +138,7 @@ io.on('connection', (socket) => {
             user.dailyTasks = dailyTasks;
             user.currentPoints += taskPoints;
             user.todayEarned += taskPoints
-            user.save();
+            await user.save();
 
         }
 
@@ -163,11 +162,13 @@ io.on('connection', (socket) => {
             const visit = parseInt(visitedData.visit);
             let points = 0;
             const user = await userModel.findOne({ email });
+
             if (user) {
                 const dailyTask = user.dailyTasks.map((dt) => {
 
-                    if (!dt.completed && new Date(dt.updatedAt).getDate() === date && visit >= dt.target && dt.task === 'visit') {
+                    if (!dt.completed && new Date(dt.date).getDate() === date && visit >= dt.target && dt.task === 'visit') {
                         points += dt.points;
+                        console.log('updated task')
                         return {
                             ...dt,
                             completed: true
@@ -176,11 +177,11 @@ io.on('connection', (socket) => {
 
                     return dt;
                 });
-
+                
                 user.dailyTasks = dailyTask;
                 user.currentPoints += points;
                 user.todayEarned += points;
-                user.save();
+                await user.save();
                 socket.emit('updatedVisitTask', user);
             }
 
