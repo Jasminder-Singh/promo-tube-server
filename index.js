@@ -34,9 +34,9 @@ app.get('/api', (req, res) => {
 const io = new Server(server, {
     cors: {
         origin: [
-            "https://promotube.in",          // your main domain
-            "https://www.promotube.in",      // optional, if www version exists
-            "https://promo-tube-server-production.up.railway.app" // optional for testing
+            "https://promotube.in",
+            "https://www.promotube.in",
+            "https://api.promotube.in",
         ],
         methods: ["GET", "POST"],
         credentials: true,
