@@ -117,15 +117,11 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('campaignDailyTask', async (email, campaigns) => { // campaigns = [{},{},{},{}]
+    socket.on('campaignDailyTask', async (email, todayCampaigns) => { // campaigns = [{},{},{},{}]
         await connectDB();
         const user = await userModel.findOne({ email }).populate('campaigns');
-
-        const todayCreatedCampaigns = user.campaigns.reduce((acc, camp) => {
-            return (new Date(camp.date).getDate() === new Date().getDate()) ? acc + 1 : acc
-
-        }, 0)
-
+        console.log(todayCampaigns);
+        const todayCreatedCampaigns = todayCampaigns.campaigns;
         let taskPoints = 0;
         if (todayCreatedCampaigns) {
 
