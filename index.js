@@ -32,8 +32,15 @@ app.get('/api', (req, res) => {
 })
 
 const io = new Server(server, {
-    cors: '*',
-    methods: ['GET', 'POST']
+    cors: {
+        origin: [
+            "https://promotube.in",          // your main domain
+            "https://www.promotube.in",      // optional, if www version exists
+            "https://promo-tube-server-production.up.railway.app" // optional for testing
+        ],
+        methods: ["GET", "POST"],
+        credentials: true,
+    },
 });
 
 // set the notifiaction to the user profile.
@@ -177,7 +184,7 @@ io.on('connection', (socket) => {
 
                     return dt;
                 });
-                
+
                 user.dailyTasks = dailyTask;
                 user.currentPoints += points;
                 user.todayEarned += points;
