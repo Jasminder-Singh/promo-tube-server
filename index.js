@@ -198,12 +198,14 @@ io.on('connection', (socket) => {
     })
 });
 
-server.listen(3001, () => {
-    console.log("✅ Server is listening on port 78965");
+const PORT = process.env.PORT || 3001;
 
-    // Run every 2 seconds
+server.listen(PORT, () => {
+    console.log(`✅ Server is listening on port ${PORT}`);
+
+    // Run cron job every day at midnight
     cron.schedule("0 0 * * *", async () => {
-        console.log("⏰ Running cron job every 2 seconds...");
+        console.log("⏰ Running cron job at midnight...");
         await cronJobController();
     });
 });
